@@ -19,21 +19,23 @@ namespace Application.Categories.Queries.GetCategoriesWithPagination
 
     public class GetCategoriesWithPaginationQueryHandler : IRequestHandler<GetCategoriesWithPaginationQuery, PaginatedList<CategoryDto>>
     {
-        private readonly IApplicationDbContext _context;
+        private readonly ICategoryQueries _queries;
         private readonly IMapper _mapper;
 
-        public GetCategoriesWithPaginationQueryHandler(IApplicationDbContext context, IMapper mapper)
+        public GetCategoriesWithPaginationQueryHandler(ICategoryQueries queries, IMapper mapper)
         {
-            _context = context;
+            _queries = queries;
             _mapper = mapper;
         }
 
         public async Task<PaginatedList<CategoryDto>> Handle(GetCategoriesWithPaginationQuery request, CancellationToken cancellationToken)
         {
-            return await _context.Categories
-                .OrderBy(x => x.Name)
+            var pagedResult = await _queries.GetCategories(request.PageNumber, request.PageSize);
+
+            return pagedResult.Items
+                .AsQueryable()
                 .ProjectTo<CategoryDto>(_mapper.ConfigurationProvider)
-                .PaginatedListAsync(request.PageNumber, request.PageSize);
+                .ToPaginatedList(pagedResult.Count, request.PageNumber, request.PageSize);
         }
     }
 }

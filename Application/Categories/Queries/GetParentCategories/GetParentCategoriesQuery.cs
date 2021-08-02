@@ -17,22 +17,23 @@ namespace Application.Categories.Queries.GetCategories
 
     public class GetParentCategoriesQueryHandler : IRequestHandler<GetParentCategoriesQuery, IEnumerable<CategoryDto>>
     {
-        private readonly IApplicationDbContext _context;
+        private readonly ICategoryQueries _queries;
         private readonly IMapper _mapper;
 
-        public GetParentCategoriesQueryHandler(IApplicationDbContext context, IMapper mapper)
+        public GetParentCategoriesQueryHandler(ICategoryQueries queries, IMapper mapper)
         {
-            _context = context;
+            _queries = queries;
             _mapper = mapper;
         }
 
         public async Task<IEnumerable<CategoryDto>> Handle(GetParentCategoriesQuery request, CancellationToken cancellationToken)
         {
-            return await _context.Categories
-                .Where(c => c.ParentId == null)
-                .OrderBy(c => c.Name)
+            var categories = await _queries.GetParentCategories();
+
+            return categories
+                .AsQueryable()
                 .ProjectTo<CategoryDto>(_mapper.ConfigurationProvider)
-                .ToListAsync();
+                .ToList();
         }
     }
 }

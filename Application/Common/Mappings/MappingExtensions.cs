@@ -1,12 +1,11 @@
 ﻿using Application.Common.Models;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Application.Common.Mappings
 {
     public static class MappingExtensions
     {
-        public static Task<PaginatedList<TDestination>> PaginatedListAsync<TDestination>(this IQueryable<TDestination> queryable, int pageNumber, int pageSize)
-            => PaginatedList<TDestination>.CreateAsync(queryable, pageNumber, pageSize);
+        public static PaginatedList<TDestination> ToPaginatedList<TDestination>(this IEnumerable<TDestination> queryable, int count, int pageNumber, int pageSize)
+            => PaginatedList<TDestination>.Create(queryable, count, pageNumber, pageSize);
     }
 }

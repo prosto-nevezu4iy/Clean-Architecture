@@ -14,18 +14,18 @@ namespace Application.Categories.Queries.GetCategoryById
 
     public class GetCategoryByIdQueryHandler : IRequestHandler<GetCategoryByIdQuery, CategoryDto>
     {
-        private readonly IApplicationDbContext _context;
+        private readonly ICategoryQueries _queries;
         private readonly IMapper _mapper;
 
-        public GetCategoryByIdQueryHandler(IApplicationDbContext context, IMapper mapper)
+        public GetCategoryByIdQueryHandler(ICategoryQueries queries, IMapper mapper)
         {
-            _context = context;
+            _queries = queries;
             _mapper = mapper;
         }
 
         public async Task<CategoryDto> Handle(GetCategoryByIdQuery request, CancellationToken cancellationToken)
         {
-            var category = await _context.Categories.FindAsync(request.Id);
+            var category = await _queries.GetCategoryById(request.Id);
 
             if(category == null)
             {
